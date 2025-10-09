@@ -4,26 +4,35 @@ import librosa
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.signal as sig
-from datetime import timedelta
+import tkinter as tk
+from tkinter import filedialog
 
+root = tk.Tk()
+root.withdraw()
 def extract_features(path):
-    #TODO upgrae this to a file picker
-    path = input("Enter the path to your audio file: ").strip()
+    path = filedialog.askopenfilename(
+        title="Select an audio file",
+        filetypes=[("Audio files", "*.mp3 *.wav *.flac *.aiff *.ogg")],
+    )
+
     y, sr = librosa.load(path, sr=None)
     # zero flattens array, which makes it easy to plot + analyze
-    rms = librosa.feature.rms(y=y)[0] 
-    zcr = librosa.feature.zero_crossing_rate(y)[0] 
-    cent = librosa.feature.spectral_centroid(y=y, sr=sr)[0] 
-    frames = range(len(cent))
-    times = librosa.frames_to_time(frames, sr=sr)
+
+
+
+
+
+    #deltas help find rapid changes
+    cent_diff = np.diff(librosa.feature.spectral_centroid(y=y, sr=sr)[0])
+    rms_diff = np.diff(librosa.feature.rms(y=y)[0]) 
+    zcr_diff = np.diff(librosa.feature.zero_crossing_rate(y)[0] )
+
+    #times for plotting
+    times = librosa.frames_to_time(np.arange(len(rms_diff)), sr=sr)
     tempo, beats = librosa.beat.beat_track(y=y, sr=sr)
     beat_times = librosa.frames_to_time(beats, sr=sr)
 
-    rms_diff = np.diff(rms) # necessary for peak detection thats not awful, detecting change over frames
-    cent_diff = np.diff(cent)
-    zcr_diff = np.diff(zcr)
-
-    return rms, zcr, cent,times,tempo, beat_times, rms_diff, cent_diff, zcr_diff
+    return times, tempo, beat_times, rms_diff, cent_diff, zcr_diff
 
 def detect_cues(rms_diff, times, beat_times):
     # Step 1: find peaks in a weighted combination of features
@@ -57,8 +66,7 @@ def detect_cues(rms_diff, times, beat_times):
     return filtered_cue_points
 
 
-
 print("Welcome to the audio feature extractor!")
-rms, zcr, cent,times,tempo, beat_times, rms_diff, cent_diff, zcr_diff = extract_features("path/to/your/audio/file.wav")
+times,tempo, beat_times, rms_diff, cent_diff, zcr_diff = extract_features("path/to/your/audio/file.wav")
 cue_times = [f"{int(t // 60)}:{int(t % 60):02}" for t in detect_cues(rms_diff, times,beat_times)]
 print("Expected cue points", cue_times) #these are very bad on some songs, but good enough for a first pass
