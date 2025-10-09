@@ -11,4 +11,4 @@ cuely uses librosa to extract zcr, spectral centroid, rms, chroma, and onset env
 
 run in cli using:
 
-```python cuely.py``
+```python cuely.py```
