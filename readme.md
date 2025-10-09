@@ -1,8 +1,14 @@
 # cuely
 
-experimenting with automatic cue point detection in audio files. 
-
-## usage
+experimenting with automatic [cue point detection]([url](https://arxiv.org/html/2407.06823v1#S3)) in songs. 
 
 
-this will load the audio, extract RMS / ZCR / spectral centroid, and plot them. The output is currently just a graph of these features, but over time it will be a mp3 file with id3v2 tagging that splits the audio into the desired cue points. later, i'll write something that will support importing into serato, virtualdj, rekordbox,, and traktor.
+# how it works
+
+cuely uses librosa to extract zcr, spectral centroid, rms, chroma, and onset envelope and performs feature ranking to beats in a song.
+
+# usage
+
+run in cli using:
+
+```python cuely.py``
