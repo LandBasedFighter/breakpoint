@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy.ndimage
 import scipy.signal
+import sklearn as sk #later for kmeans clustering
 import tkinter as tk
 from tkinter import filedialog
 
@@ -41,30 +42,14 @@ def extract_features(path=None):
 
 
 def detect_cues (rms_diff, cent_diff, zcr_diff, onset_diff, chroma_diff, times, beat_times, tempo):
-    
-    # normalize features using min max normalization in a sliding window
-    window_seconds = 10
-    window_size = int(window_seconds * (len(rms_diff) / times[-1])) #number of frames in window
-    def min_max_normalize(feature):
-        padded = np.pad(feature, (window_size//2, window_size//2), mode='edge')
-        normalized = np.zeros_like(feature)
-        for i in range(len(feature)):
-            window = padded[i:i+window_size]
-            min_val = np.min(window)
-            max_val = np.max(window)
-            if max_val - min_val > 0:
-                normalized[i] = (feature[i] - min_val) / (max_val - min_val)
-            else:
-                normalized[i] = 0
-        return normalized
-    
-    # take absolute value of features
-    rms_diff_z = min_max_normalize(np.abs(rms_diff))
-    cent_diff_z = min_max_normalize(np.abs(cent_diff))
-    zcr_diff_z = min_max_normalize(np.abs(zcr_diff))
-    onset_diff_z = min_max_normalize(np.abs(onset_diff))
-    chroma_diff_z = min_max_normalize(np.abs(chroma_diff))
+    #TODO: implement feature matrix
 
+    scaler = sk.preprocessing.MinMaxScaler()
+    rms_diff_z = scaler.fit_transform(rms_diff.reshape(-1, 1)).flatten()
+    cent_diff_z = scaler.fit_transform(cent_diff.reshape(-1, 1)).flatten() 
+    zcr_diff_z = scaler.fit_transform(zcr_diff.reshape(-1, 1)).flatten()
+    onset_diff_z = scaler.fit_transform(onset_diff.reshape(-1, 1)).flatten()
+    chroma_diff_z = scaler.fit_transform(chroma_diff.reshape(-1, 1)).flatten()
 
     #smooth all features with a gaussian filter
     rms_diff_z = scipy.ndimage.gaussian_filter1d(rms_diff_z, sigma=2)
@@ -73,7 +58,7 @@ def detect_cues (rms_diff, cent_diff, zcr_diff, onset_diff, chroma_diff, times, 
     onset_diff_z = scipy.ndimage.gaussian_filter1d(onset_diff_z, sigma=2)
     chroma_diff_z = scipy.ndimage.gaussian_filter1d(chroma_diff_z, sigma=2)
     
-
+    #TODO: try using kmeans clustering to identify sections of high activity instead of peak finding, or in conjunction with peak finding
     #weighted fusion of features
     #weights determined by trial and error
     score = (0.4 * rms_diff_z + 
