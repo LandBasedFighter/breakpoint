@@ -112,12 +112,12 @@ def detect_cues (rms_diff, cent_diff, zcr_diff, onset_diff, chroma_diff, times, 
         # find nearest beat
         nearest_beat = beat_times[np.argmin(np.abs(beat_times - t))]
         
-        # then check if it's far enough from last cue
+        # then check if its far enough from last cue
         if nearest_beat - last_cue_time >= min_interval:
             cue_times_quantized.append(nearest_beat)
             last_cue_time = nearest_beat
 
-    # C
+    # format times as m:ss
     cue_times_quantized = [f"{int(t // 60)}:{int(t % 60):02}" for t in cue_times_quantized]
     return cue_times_quantized
         
