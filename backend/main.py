@@ -95,6 +95,9 @@ def detect_cues (rms_diff, cent_diff, zcr_diff, onset_diff, chroma_diff, times, 
     peaks, _ = scipy.signal.find_peaks(score, height=threshold, distance=distance, prominence=0.1)
     cue_times = times[peaks]
 
+
+
+
     #quanzalize to nearest beat
     beats_to_sec = 60/tempo
 
@@ -102,20 +105,19 @@ def detect_cues (rms_diff, cent_diff, zcr_diff, onset_diff, chroma_diff, times, 
     min_beats = 16
     min_interval = min_beats * beats_to_sec
 
-
-    #quantize cue times to nearest beat, ensuring minimum spacing
     cue_times_quantized = []
     last_cue_time = -np.inf
+
     for t in cue_times:
-        if t - last_cue_time < min_interval:
-            continue
-        #find nearest beat
+        # find nearest beat
         nearest_beat = beat_times[np.argmin(np.abs(beat_times - t))]
+        
+        # then check if it's far enough from last cue
         if nearest_beat - last_cue_time >= min_interval:
             cue_times_quantized.append(nearest_beat)
             last_cue_time = nearest_beat
-    
-    #convert to m:ss format
+
+    # C
     cue_times_quantized = [f"{int(t // 60)}:{int(t % 60):02}" for t in cue_times_quantized]
     return cue_times_quantized
         
