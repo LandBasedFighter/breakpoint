@@ -9,6 +9,4 @@ breakpoint uses librosa to extract zcr, spectral centroid, rms, chroma, and onse
 
 # usage
 
-run in cli using:
-
-```python breakpoint.py```
+cli update coming soon!
