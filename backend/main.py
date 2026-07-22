@@ -36,7 +36,6 @@ def bounded_difference(feature, scale=1.0):
 
 
 def extract_features(path):
-    print(f"Loading file: {path}")
     y, sr = librosa.load(str(path), sr=SAMPLE_RATE)
 
     frame_count = 1 + len(y) // HOP_LENGTH
@@ -213,7 +212,7 @@ def parse_args(argv=None):
 
 def main(argv=None):
     args = parse_args(argv)
-    print("Welcome to breakpoint!")
+    print(f"Analyzing {args.audio_file.name}...")
     (
         times,
         tempo,
@@ -236,7 +235,15 @@ def main(argv=None):
         beat_times,
         tempo,
     )
-    print("Expected cue points", cue_times)
+    print(f"Tempo: {tempo:.1f} BPM")
+
+    if not cue_times:
+        print("Cue points: none found")
+        return
+
+    print(f"Cue points ({len(cue_times)}):")
+    for cue_time in cue_times:
+        print(f"  {cue_time}")
 
 
 if __name__ == "__main__":
